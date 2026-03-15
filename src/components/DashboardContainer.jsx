@@ -1,18 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Bell, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useApp } from '../contexts/AppContext';
 import GreetingClock from './GreetingClock';
 import PersonalDashboard from './PersonalDashboard';
 import CompanyDashboard from './CompanyDashboard';
+import TransacoesPage from './TransacoesPage';
+import InvestimentosPage from './InvestimentosPage';
 import Sidebar from './Sidebar';
+import BottomNav from './BottomNav';
 
-// Use the logo the user provided
+// Novos módulos enterprise
+import SalesPage from './enterprise/SalesPage';
+import UtmPage from './enterprise/UtmPage';
+import MetaAdsPage from './enterprise/MetaAdsPage';
+import MetasPage from './enterprise/MetasPage';
+import FinanceiroEmpresaPage from './enterprise/FinanceiroEmpresaPage';
+import IntegracoesPage from './enterprise/IntegracoesPage';
+import CadastrosPage from './enterprise/CadastrosPage';
+import AssinaturasPage from './enterprise/AssinaturasPage';
+import ConfiguracoesPage from './enterprise/ConfiguracoesPage';
+
 const LOGO_NE = '/ne-logo.png';
 
 const DashboardContainer = () => {
+  const { loading } = useApp();
   const [isCompanyMode, setIsCompanyMode] = useState(false);
   const [portalActive, setPortalActive] = useState(false);
   const [dadosVisiveis, setDadosVisiveis] = useState(true);
-  const portalRef = useRef(null);
+  const [activePage, setActivePage] = useState('overview');
 
   useEffect(() => {
     if (isCompanyMode) {
@@ -26,68 +41,96 @@ const DashboardContainer = () => {
     setPortalActive(true);
     setTimeout(() => {
       setIsCompanyMode(prev => !prev);
+      setActivePage('overview');
     }, 400);
     setTimeout(() => {
       setPortalActive(false);
     }, 900);
   };
 
+  const renderPage = () => {
+    // Escopo Empresa
+    if (isCompanyMode) {
+      switch (activePage) {
+        case 'vendas': return <SalesPage oculto={!dadosVisiveis} />;
+        case 'utms': return <UtmPage oculto={!dadosVisiveis} />;
+        case 'meta-ads': return <MetaAdsPage oculto={!dadosVisiveis} />;
+        case 'metas': return <MetasPage oculto={!dadosVisiveis} />;
+        case 'financeiro': return <FinanceiroEmpresaPage oculto={!dadosVisiveis} />;
+        case 'integracoes': return <IntegracoesPage oculto={!dadosVisiveis} />;
+        case 'cadastros': return <CadastrosPage oculto={!dadosVisiveis} />;
+        case 'assinaturas': return <AssinaturasPage oculto={!dadosVisiveis} />;
+        case 'configuracoes': return <ConfiguracoesPage oculto={!dadosVisiveis} />;
+        default: return <CompanyDashboard oculto={!dadosVisiveis} />;
+      }
+    }
+
+    // Escopo Pessoal
+    if (activePage === 'transacoes') {
+      return <TransacoesPage escopo="pessoal" oculto={!dadosVisiveis} />;
+    }
+    if (activePage === 'investimentos') {
+      return <InvestimentosPage oculto={!dadosVisiveis} />;
+    }
+    return <PersonalDashboard oculto={!dadosVisiveis} />;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-center flex-column" style={{ height: '100vh', width: '100vw' }}>
+        <Loader2 className="animate-spin" size={48} color="var(--color-primary)" />
+        <p className="text-muted">Carregando seus dados...</p>
+      </div>
+    );
+  }
+
+
   return (
     <div className="app-layout">
       {/* PORTAL OVERLAY */}
       <div className="portal-overlay">
-        <div
-          ref={portalRef}
-          className={`portal-circle ${portalActive ? 'expanding' : ''} ${isCompanyMode && portalActive ? 'reverse' : ''}`}
-        />
+        <div className={`portal-circle ${portalActive ? 'expanding' : ''} ${isCompanyMode && portalActive ? 'reverse' : ''}`} />
       </div>
 
-      <Sidebar isCompanyMode={isCompanyMode} />
+      <Sidebar isCompanyMode={isCompanyMode} activePage={activePage} setActivePage={setActivePage} />
 
       <main className="main-content">
-        {/* TOPBAR */}
         <header className="topbar">
           <GreetingClock />
-
+          
           <div className="topbar-right">
             <button
               onClick={() => setDadosVisiveis(!dadosVisiveis)}
-              className="btn-outline flex-center"
-              style={{ gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem' }}
+              className="btn-premium btn-ocultar"
             >
-              {dadosVisiveis ? <Eye size={18} /> : <EyeOff size={18} />}
-              {dadosVisiveis ? 'Ocultar Valores' : 'Mostrar Valores'}
+              {dadosVisiveis ? <Eye size={16} /> : <EyeOff size={16} />}
+              <span>Ocultar</span>
             </button>
 
-            <button className="icon-btn" title="Buscar"><Search size={18} /></button>
-            <button className="icon-btn" title="Notificações"><Bell size={18} /></button>
+            <button className="icon-btn-circle"><Search size={18} /></button>
+            <button className="icon-btn-circle"><Bell size={18} /></button>
 
-            {/* PORTAL TRIGGER - Nação Esportes Logo */}
-            <div className="portal-trigger" onClick={triggerPortal} title="Alternar para Dashboard da Empresa">
-              {isCompanyMode ? (
-                <>
-                  <span>👤</span>
-                  <span style={{ fontSize: '0.85rem' }}>Pessoal</span>
-                </>
-              ) : (
-                <>
-                  <img src={LOGO_NE} alt="Nação Esportes" onError={(e) => { e.target.style.display = 'none'; }} />
-                  <span style={{ fontSize: '0.85rem' }}>Empresa</span>
-                </>
-              )}
-            </div>
+            <button 
+              className="btn-mode-switcher"
+              onClick={triggerPortal}
+            >
+              <div className="mode-icon-box">
+                {isCompanyMode ? <Eye size={14} /> : <img src="/ne-logo.png" alt="" />}
+              </div>
+              <span className="mode-label">
+                {isCompanyMode ? 'Pessoal' : 'Empresa'}
+              </span>
+            </button>
 
             <div className="profile-btn">L</div>
           </div>
         </header>
 
-        {/* DASHBOARD CONTENT */}
-        {isCompanyMode ? (
-          <CompanyDashboard oculto={!dadosVisiveis} />
-        ) : (
-          <PersonalDashboard oculto={!dadosVisiveis} />
-        )}
+        {renderPage()}
       </main>
+
+
+      <BottomNav activePage={activePage} setActivePage={setActivePage} isCompanyMode={isCompanyMode} />
     </div>
   );
 };

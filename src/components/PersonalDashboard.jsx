@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, Plus, Pencil, X } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { personalData } from '../data';
+import { useApp } from '../contexts/AppContext';
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -9,10 +9,10 @@ const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const PersonalDashboard = ({ oculto = false }) => {
+  const { transacoes, categorias, investimentos, parcelas, addCategoria, updateCategoria, deleteCategoria } = useApp();
   const now = new Date();
   const [mesSelecionado, setMesSelecionado] = useState(now.getMonth());
   const [anoSelecionado, setAnoSelecionado] = useState(now.getFullYear());
-  const [categories, setCategories] = useState(['Essencial', 'Variável', 'Moradia', 'Lazer', 'Transporte']);
   const [newCategory, setNewCategory] = useState('');
 
   const mudarMes = (delta) => {
@@ -25,14 +25,16 @@ const PersonalDashboard = ({ oculto = false }) => {
   };
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      setCategories([...categories, newCategory.trim()]);
+    if (newCategory.trim()) {
+      addCategoria('pessoal', 'despesa', newCategory.trim());
       setNewCategory('');
     }
   };
 
-  const totalIncomes = personalData.incomes.reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpenses = personalData.expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const personalTransacoes = transacoes.filter(t => t.escopo === 'pessoal');
+  const totalIncomes = personalTransacoes.filter(t => t.tipo === 'receita').reduce((acc, curr) => acc + curr.valor, 0);
+  const totalExpenses = personalTransacoes.filter(t => t.tipo === 'despesa').reduce((acc, curr) => acc + curr.valor, 0);
+  const currentBalance = totalIncomes - totalExpenses;
 
   const blurStyle = {
     filter: oculto ? 'blur(12px)' : 'none',
@@ -46,13 +48,13 @@ const PersonalDashboard = ({ oculto = false }) => {
     { name: 'Despesas', value: totalExpenses, color: 'var(--color-warning)' },
   ];
 
-  const dadosBarras = personalData.expenses.map(e => ({
-    nome: e.name.length > 12 ? e.name.substring(0, 12) + '...' : e.name,
-    valor: e.amount
+  const dadosBarras = personalTransacoes.filter(t => t.tipo === 'despesa').map(e => ({
+    nome: e.nome.length > 12 ? e.nome.substring(0, 12) + '...' : e.nome,
+    valor: e.valor
   }));
 
   const cards = [
-    { title: 'Saldo Principal', value: formatCurrency(personalData.balance), icon: DollarSign, type: 'primary' },
+    { title: 'Saldo Principal', value: formatCurrency(currentBalance), icon: DollarSign, type: 'primary' },
     { title: 'Entradas no Mês', value: formatCurrency(totalIncomes), icon: TrendingUp, type: 'success' },
     { title: 'Saídas no Mês', value: formatCurrency(totalExpenses), icon: TrendingDown, type: 'warning' },
   ];
@@ -60,25 +62,21 @@ const PersonalDashboard = ({ oculto = false }) => {
   return (
     <div>
       {/* MONTH SELECTOR */}
-      <div className="glass-panel month-selector">
-        <button className="btn-outline" onClick={() => mudarMes(-1)} style={{ padding: '0.5rem', borderRadius: '8px' }}>
-          <ChevronLeft size={20} />
-        </button>
-        <div style={{ textAlign: 'center', minWidth: '150px' }}>
-          <h3 className="text-serif" style={{ margin: 0, textTransform: 'capitalize' }}>{MESES[mesSelecionado]} {anoSelecionado}</h3>
-        </div>
-        <button className="btn-outline" onClick={() => mudarMes(1)} style={{ padding: '0.5rem', borderRadius: '8px' }}>
-          <ChevronRight size={20} />
-        </button>
+      <div className="month-selector glass-panel compact" style={{ marginBottom: 'var(--space-lg)' }}>
+        <button className="icon-btn" onClick={() => mudarMes(-1)}><ChevronLeft size={20} /></button>
+        <span className="current-month">
+          {MESES[mesSelecionado]} {anoSelecionado}
+        </span>
+        <button className="icon-btn" onClick={() => mudarMes(1)}><ChevronRight size={20} /></button>
       </div>
 
+
       {/* PAGE HEADER */}
-      <div className="page-header">
-        <div>
-          <h1>Controle Pessoal</h1>
-          <p className="text-muted" style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Análise detalhada do período selecionado.</p>
-        </div>
+      <div className="dashboard-hero">
+        <h1 className="hero-title">Controle Pessoal</h1>
+        <p className="text-muted">Análise detalhada do período selecionado.</p>
       </div>
+
 
       {/* OVERVIEW CARDS */}
       <div className="overview-grid">
@@ -101,12 +99,14 @@ const PersonalDashboard = ({ oculto = false }) => {
       </div>
 
       {/* CHARTS ROW */}
-      <div className="data-grid-2">
+      <div className="grid-2">
         <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Proporção Entradas vs Saídas</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>Rentabilidade mensal</p>
-          <div style={{ ...blurStyle, display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1, height: 220 }}>
+          <div className="header-row">
+            <h3>Proporção Entradas vs Saídas</h3>
+            <p className="text-muted">Rentabilidade mensal</p>
+          </div>
+          <div className="chart-container-flex" style={blurStyle}>
+            <div className="chart-box">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={dadosPizza} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value" stroke="none">
@@ -118,18 +118,18 @@ const PersonalDashboard = ({ oculto = false }) => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1.5rem' }}>
-              <div>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Receitas</p>
-                <h3 style={{ margin: 0, color: 'var(--color-success)' }}>{formatCurrency(totalIncomes)}</h3>
+            <div className="chart-legend">
+              <div className="legend-item">
+                <p className="text-muted">Receitas</p>
+                <h3 className="success">{formatCurrency(totalIncomes)}</h3>
               </div>
-              <div>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Despesas</p>
-                <h3 style={{ margin: 0, color: 'var(--color-warning)' }}>{formatCurrency(totalExpenses)}</h3>
+              <div className="legend-item">
+                <p className="text-muted">Despesas</p>
+                <h3 className="warning">{formatCurrency(totalExpenses)}</h3>
               </div>
-              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem' }}>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Resultado</p>
-                <h2 style={{ margin: 0, color: (totalIncomes - totalExpenses) >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+              <div className="legend-total">
+                <p className="text-muted">Resultado</p>
+                <h2 className={(totalIncomes - totalExpenses) >= 0 ? 'success' : 'danger'}>
                   {formatCurrency(totalIncomes - totalExpenses)}
                 </h2>
               </div>
@@ -139,25 +139,25 @@ const PersonalDashboard = ({ oculto = false }) => {
 
         {/* INVESTMENTS PANEL */}
         <div className="glass-panel section-panel">
-          <div className="flex-between" style={{ marginBottom: '1rem' }}>
-            <h3 className="text-serif" style={{ margin: 0 }}>Investimentos</h3>
-            <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>Previsão em tempo real</span>
+          <div className="flex-between header-row">
+            <h3>Investimentos</h3>
+            <span className="badge-small">Previsão em tempo real</span>
           </div>
-          <div style={blurStyle}>
-            <h2 style={{ color: 'var(--color-success)', margin: '0 0 0.5rem' }}>{formatCurrency(personalData.investments.total)}</h2>
-            <span className="text-muted" style={{ fontSize: '0.8rem' }}>{personalData.investments.forecast}</span>
-            <div style={{ marginTop: '1rem' }}>
-              {personalData.investments.items.map(inv => (
-                <div key={inv.id} className="flex-between" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                  <div className="flex-center" style={{ gap: '0.75rem' }}>
-                    <div style={{ color: 'var(--color-success)', background: 'var(--color-success-bg)', padding: '0.5rem', borderRadius: '8px' }}>
+          <div className="stats-summary" style={blurStyle}>
+            <h2 className="success">{formatCurrency(investimentos.reduce((sum, i) => sum + i.valor, 0))}</h2>
+            <span className="text-muted">+1.5% este mês</span>
+            <div className="items-list">
+              {investimentos.map(inv => (
+                <div key={inv.id} className="list-item-premium">
+                  <div className="item-info-flex">
+                    <div className="icon-badge success">
                       <TrendingUp size={14} />
                     </div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{inv.name}</span>
+                    <span>{inv.nome}</span>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <strong style={{ fontSize: '0.9rem' }}>{formatCurrency(inv.amount)}</strong>
-                    <p className="text-muted" style={{ fontSize: '0.7rem', margin: 0 }}>{inv.return}</p>
+                  <div className="item-values">
+                    <strong className="main-value">{formatCurrency(inv.valor)}</strong>
+                    <p className="sub-value">{inv.retorno}</p>
                   </div>
                 </div>
               ))}
@@ -166,13 +166,16 @@ const PersonalDashboard = ({ oculto = false }) => {
         </div>
       </div>
 
+
       {/* BOTTOM ROW */}
       <div className="data-grid-equal">
         {/* BAR CHART */}
         <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Top Despesas</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>Maiores saídas no período</p>
-          <div style={{ ...blurStyle, width: '100%', height: 250 }}>
+          <div className="header-row">
+            <h3>Top Despesas</h3>
+            <p className="text-muted">Maiores saídas no período</p>
+          </div>
+          <div className="chart-box-full" style={blurStyle}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dadosBarras} layout="vertical" margin={{ top: 0, right: 30, left: 60, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
@@ -185,44 +188,71 @@ const PersonalDashboard = ({ oculto = false }) => {
           </div>
         </div>
 
+
         {/* FUTURE EXPENSES + CATEGORIES */}
         <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Despesas Futuras</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Parcelamentos e previsões</p>
-          <div style={blurStyle}>
-            {personalData.futureExpenses.map(fExp => (
-              <div key={fExp.id} className="flex-between" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                <div>
-                  <strong style={{ fontSize: '0.875rem' }}>{fExp.name}</strong>
-                  <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Vence: {fExp.dueDate} • Parc: {fExp.installments}</p>
+          <div className="header-row">
+            <h3>Despesas Futuras</h3>
+            <p className="text-muted">Parcelamentos e previsões</p>
+          </div>
+          <div className="items-list" style={blurStyle}>
+            {parcelas.filter(p => p.escopo === 'pessoal').map(fExp => (
+              <div key={fExp.id} className="list-item-premium">
+                <div className="item-info">
+                  <div className="name">{fExp.nome}</div>
+                  <div className="category">Vence: {fExp.dataVencimento} • Parc: {fExp.parcelaAtual}</div>
                 </div>
-                <span style={{ fontWeight: 600 }}>{formatCurrency(fExp.amount)}</span>
+                <span className="value">{formatCurrency(fExp.valor)}</span>
               </div>
             ))}
           </div>
 
+
           {/* Category Manager */}
-          <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
-            <h4 style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>Categorias de Despesa</h4>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <div className="category-manager">
+            <h4>Categorias de Despesa</h4>
+            <div className="manager-actions">
               <input
                 type="text"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 placeholder="Nova categoria..."
                 onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
-                style={{ flex: 1 }}
               />
-              <button className="btn-primary flex-center" onClick={handleAddCategory} style={{ padding: '0.5rem 1rem', gap: '0.25rem' }}>
+              <button className="btn-premium btn-primary" onClick={handleAddCategory}>
                 <Plus size={16} /> Criar
               </button>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {categories.map((cat, idx) => (
-                <span key={idx} className="category-tag">{cat}</span>
+            <div className="tags-container">
+              {categorias.filter(c => c.escopo === 'pessoal' && c.tipo === 'despesa').map((cat) => (
+                <div key={cat.id} className="category-tag-premium">
+                  <span>{cat.nome}</span>
+                  <div className="tag-actions">
+                    <button 
+                      onClick={() => {
+                        const novoNome = prompt('Novo nome para a categoria:', cat.nome);
+                        if (novoNome && novoNome !== cat.nome) updateCategoria(cat.id, { nome: novoNome });
+                      }}
+                      className="tag-btn"
+                      title="Editar"
+                    >
+                      <Pencil size={12} /> 
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (confirm(`Excluir categoria "${cat.nome}"?`)) deleteCategoria(cat.id);
+                      }}
+                      className="tag-btn danger"
+                      title="Excluir"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, ShoppingCart, Monitor, Briefcase } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { companyData } from '../data';
+import { 
+  TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, 
+  ShoppingCart, Target, BarChart3, Calculator, Receipt, 
+  ArrowUpRight, ArrowDownRight, Briefcase, Plus, Pencil, Trash2, Link2
+} from 'lucide-react';
+import { useApp } from '../contexts/AppContext';
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -9,6 +12,7 @@ const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const CompanyDashboard = ({ oculto = false }) => {
+  const { transacoes, ecommerceStats, deleteTransacao } = useApp();
   const now = new Date();
   const [mesSelecionado, setMesSelecionado] = useState(now.getMonth());
   const [anoSelecionado, setAnoSelecionado] = useState(now.getFullYear());
@@ -22,194 +26,278 @@ const CompanyDashboard = ({ oculto = false }) => {
     setAnoSelecionado(novoAno);
   };
 
-  const totalRevenues = companyData.revenues.reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpenses = companyData.expenses.reduce((acc, curr) => acc + curr.amount, 0);
-
   const blurStyle = {
     filter: oculto ? 'blur(12px)' : 'none',
-    userSelect: oculto ? 'none' : 'auto',
     transition: 'filter 0.3s ease',
-    pointerEvents: oculto ? 'none' : 'auto',
   };
 
-  const dadosPizza = [
-    { name: 'Faturamento', value: totalRevenues, color: 'var(--color-primary)' },
-    { name: 'Custos', value: totalExpenses, color: 'var(--color-danger)' },
+  const kpis = [
+    { label: 'Faturamento', value: formatCurrency(ecommerceStats.kpis.faturamento), sub: 'Sem meta', icon: DollarSign },
+    { label: 'Investimento', value: formatCurrency(ecommerceStats.kpis.investimento), sub: 'Sem meta', icon: ShoppingCart },
+    { label: 'Lucro Bruto', value: formatCurrency(ecommerceStats.kpis.lucroBruto), sub: 'Margem: 0%', icon: TrendingUp },
+    { label: 'Lucro sogra', value: formatCurrency(ecommerceStats.kpis.lucroSogra), sub: '36 vendas', icon: Calculator },
+    { label: 'ROAS', value: ecommerceStats.kpis.roas || '-', sub: 'Pode melhorar', icon: Target },
+    { label: 'Contador (CPA)', value: formatCurrency(ecommerceStats.kpis.cpa), sub: 'Custo por', icon: Receipt },
   ];
 
-  const dadosBarras = companyData.revenues.map(r => ({
-    nome: r.name.length > 15 ? r.name.substring(0, 15) + '...' : r.name,
-    valor: r.amount
-  }));
-
-  const ICONS_MAP = {
-    'Marketing': ShoppingCart,
-    'Infra': Monitor,
-    'Administrativo': Briefcase,
-  };
-
-  const cards = [
-    { title: 'Caixa Empresa', value: formatCurrency(companyData.balance), icon: DollarSign, type: 'primary' },
-    { title: 'Faturamento Total', value: formatCurrency(totalRevenues), icon: TrendingUp, type: 'success' },
-    { title: 'Custos Operacionais', value: formatCurrency(totalExpenses), icon: TrendingDown, type: 'warning' },
-  ];
+  const manualExpenses = transacoes.filter(t => t.escopo === 'empresa' && t.tipo === 'despesa');
 
   return (
-    <div>
-      {/* MONTH SELECTOR */}
-      <div className="glass-panel month-selector">
-        <button className="btn-outline" onClick={() => mudarMes(-1)} style={{ padding: '0.5rem', borderRadius: '8px' }}>
-          <ChevronLeft size={20} />
-        </button>
-        <div style={{ textAlign: 'center', minWidth: '150px' }}>
-          <h3 className="text-serif" style={{ margin: 0, textTransform: 'capitalize' }}>{MESES[mesSelecionado]} {anoSelecionado}</h3>
+    <div className="wintrack-theme">
+      {/* FILTERS SECTION */}
+      <div className="flex-between dashboard-filters">
+        <div className="month-selector glass-panel compact">
+          <button className="icon-btn" onClick={() => mudarMes(-1)}><ChevronLeft size={20} /></button>
+          <span className="current-month">
+            {MESES[mesSelecionado]} {anoSelecionado}
+          </span>
+          <button className="icon-btn" onClick={() => mudarMes(1)}><ChevronRight size={20} /></button>
         </div>
-        <button className="btn-outline" onClick={() => mudarMes(1)} style={{ padding: '0.5rem', borderRadius: '8px' }}>
-          <ChevronRight size={20} />
-        </button>
+        
+        <div className="glass-panel filter-pills">
+          {['Hoje', 'Ontem', '7 dias', 'Mês', 'Máximo'].map(f => (
+            <button 
+              key={f} 
+              className={`filter-pill ${f === 'Hoje' ? 'active' : ''}`} 
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* PAGE HEADER */}
-      <div className="page-header">
-        <div>
-          <h1>Nação Esportes</h1>
-          <p className="text-muted" style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Painel financeiro da empresa.</p>
+
+      {/* LARGE TITLE SECTION */}
+      <div className="dashboard-hero">
+        <h1 className="hero-title">
+          Painel Nação Esportes
+        </h1>
+
+        <div className="hero-actions">
+          <button className="btn-premium btn-outline">
+            <Link2 size={22} /> <span>Conectar Nuvemshop</span>
+          </button>
+          <button className="btn-premium btn-danger">
+            <TrendingDown size={22} /> <span>Nova Despesa</span>
+          </button>
+          <button className="btn-premium btn-primary">
+            <TrendingUp size={22} /> <span>Nova Receita</span>
+          </button>
         </div>
       </div>
 
-      {/* OVERVIEW CARDS */}
-      <div className="overview-grid">
-        {cards.map((card, i) => {
-          const Icon = card.icon;
+
+      {/* KPI GRID */}
+      <div className="wintrack-kpi-grid" style={blurStyle}>
+        {kpis.map((kpi, i) => {
+          const Icon = kpi.icon;
+          const isMainKpi = kpi.label === 'Faturamento' || kpi.label === 'Lucro Bruto';
           return (
-            <div key={i} className="glass-panel overview-card">
-              <div className="card-header">
-                <h3 className="card-title">{card.title}</h3>
-                <div className={`card-icon ${card.type}`}>
-                  <Icon size={20} />
-                </div>
-              </div>
-              <div className="card-value" style={blurStyle}>{card.value}</div>
+            <div key={i} className={`wintrack-card ${isMainKpi ? 'gold-border' : ''}`}>
+              <div className="label">{kpi.label}</div>
+              <div className="value">{kpi.value}</div>
+              <div className="sub-value">{kpi.sub}</div>
+              <div className="icon-box"><Icon size={20} /></div>
             </div>
           );
         })}
       </div>
 
-      {/* CHARTS ROW */}
-      <div className="data-grid-2">
+      {/* OPERATIONAL DATA */}
+      <div className="grid-2">
         <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Faturamento vs Custos</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>Visão geral do período</p>
-          <div style={{ ...blurStyle, display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1, height: 220 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={dadosPizza} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value" stroke="none">
-                    {dadosPizza.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1.5rem' }}>
-              <div>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Faturamento</p>
-                <h3 style={{ margin: 0, color: 'var(--color-success)' }}>{formatCurrency(totalRevenues)}</h3>
-              </div>
-              <div>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Custos</p>
-                <h3 style={{ margin: 0, color: 'var(--color-danger)' }}>{formatCurrency(totalExpenses)}</h3>
-              </div>
-              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem' }}>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Lucro Líquido</p>
-                <h2 style={{ margin: 0, color: 'var(--color-primary)' }}>{formatCurrency(totalRevenues - totalExpenses)}</h2>
-              </div>
-            </div>
+          <div className="flex-between header-row">
+            <h3><Receipt size={18} /> Custos Operacionais</h3>
           </div>
-        </div>
-
-        {/* REVENUE BREAKDOWN */}
-        <div className="glass-panel section-panel">
-          <div className="flex-between" style={{ marginBottom: '1rem' }}>
-            <h3 className="text-serif" style={{ margin: 0 }}>Fontes de Receita</h3>
-            <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>Info Produtos & Fixos</span>
-          </div>
-          <div style={blurStyle}>
-            {companyData.revenues.map(rev => (
-              <div key={rev.id} className="flex-between" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                <div className="flex-center" style={{ gap: '0.75rem' }}>
-                  <div style={{ color: 'var(--color-primary)', background: 'rgba(0,0,0,0.05)', padding: '0.5rem', borderRadius: '8px' }}>
-                    <TrendingUp size={14} />
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{rev.name}</span>
-                    <p className="text-muted" style={{ fontSize: '0.7rem', margin: 0 }}>{rev.category}</p>
-                  </div>
+          <div className="wintrack-list" style={blurStyle}>
+            {manualExpenses.map(exp => (
+              <div key={exp.id} className="list-item-premium">
+                <div className="item-info">
+                  <div className="name">{exp.nome}</div>
+                  <div className="category">{exp.categoria}</div>
                 </div>
-                <strong style={{ fontSize: '0.9rem' }}>{formatCurrency(rev.amount)}</strong>
+                <div className="item-actions">
+                  <span className="value danger">{formatCurrency(exp.valor)}</span>
+                  <button className="icon-btn delete" onClick={() => deleteTransacao(exp.id)}><Trash2 size={14} /></button>
+                </div>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* BOTTOM ROW */}
-      <div className="data-grid-equal">
-        {/* BAR CHART */}
-        <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Performance por Produto</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>Receitas detalhadas</p>
-          <div style={{ ...blurStyle, width: '100%', height: 250 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dadosBarras} layout="vertical" margin={{ top: 0, right: 30, left: 60, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
-                <XAxis type="number" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text-muted)', fontSize: 11 }} />
-                <YAxis type="category" dataKey="nome" axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text)', fontSize: 12, fontWeight: 500 }} width={80} />
-                <Tooltip formatter={(value) => [formatCurrency(value), 'Faturamento']} contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px' }} />
-                <Bar dataKey="valor" fill="var(--color-primary)" radius={[0, 6, 6, 0]} barSize={24} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="list-footer">
+              <span>Total de Custos</span>
+              <span className="danger">{formatCurrency(manualExpenses.reduce((acc, curr) => acc + curr.valor, 0))}</span>
+            </div>
           </div>
         </div>
 
-        {/* COSTS & FUTURE EXPENSES */}
         <div className="glass-panel section-panel">
-          <h3 className="text-serif" style={{ marginBottom: '0.25rem' }}>Custos & Previsões</h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Saídas e próximos vencimentos</p>
-          <div style={blurStyle}>
-            {companyData.expenses.map(exp => {
-              const ExpIcon = ICONS_MAP[exp.category] || Briefcase;
-              return (
-                <div key={exp.id} className="flex-between" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                  <div className="flex-center" style={{ gap: '0.75rem' }}>
-                    <div style={{ color: 'var(--color-danger)', background: 'var(--color-danger-bg)', padding: '0.5rem', borderRadius: '8px' }}>
-                      <ExpIcon size={14} />
-                    </div>
-                    <div>
-                      <strong style={{ fontSize: '0.875rem' }}>{exp.name}</strong>
-                      <p className="text-muted" style={{ fontSize: '0.7rem', margin: 0 }}>{exp.category}</p>
-                    </div>
-                  </div>
-                  <span style={{ fontWeight: 600, color: 'var(--color-danger)' }}>{formatCurrency(exp.amount)}</span>
-                </div>
-              );
-            })}
-
-            <div style={{ marginTop: '1rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
-              <h4 style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>Previsões Futuras</h4>
-              {companyData.futureExpenses.map(fExp => (
-                <div key={fExp.id} className="flex-between" style={{ padding: '0.5rem 0' }}>
-                  <div>
-                    <strong style={{ fontSize: '0.85rem' }}>{fExp.name}</strong>
-                    <p className="text-muted" style={{ fontSize: '0.7rem', margin: 0 }}>Previsto: {fExp.dueDate}</p>
-                  </div>
-                  <span style={{ fontWeight: 600 }}>{formatCurrency(fExp.amount)}</span>
-                </div>
-              ))}
+          <div className="flex-between header-row">
+            <h3><Target size={18} /> Performance</h3>
+          </div>
+          <div className="stats-container" style={blurStyle}>
+            <div className="stat-row">
+              <span className="text-muted">Período de ROI</span>
+              <span className="stat-value">0,0 %</span>
+            </div>
+            <div className="stat-row">
+              <span className="text-muted">Total de Vendas</span>
+              <span className="stat-value highlight">36</span>
             </div>
           </div>
         </div>
       </div>
+
+
+      {/* TOP 10 DATA */}
+      <div className="grid-2">
+        <div className="glass-panel section-panel">
+          <div className="flex-between header-row">
+            <h3><ShoppingCart size={18} /> Top 10 - Qtd Vendida</h3>
+          </div>
+          <div className="wintrack-table-container">
+            <table className="wintrack-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Produto</th>
+                  <th>Qtd</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { id: 1, nome: 'Camisa Grêmio III 25/26 - Torcedor Umbro Mas...', qtd: 5, valor: 189.90 },
+                  { id: 2, nome: 'Camisa Grêmio I 25/26 - Torcedor Umbro Mas...', qtd: 3, valor: 189.90 },
+                  { id: 3, nome: 'Camisa Internacional I 24/25 - Torcedor Adidas...', qtd: 2, valor: 169.90 },
+                ].map(p => (
+                  <tr key={p.id}>
+                    <td className="rank"><strong>{p.id}</strong></td>
+                    <td className="product-name">{p.nome}</td>
+                    <td className="quantity">{p.qtd}</td>
+                    <td className="price">{formatCurrency(p.valor)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-panel section-panel">
+          <div className="flex-between header-row">
+            <h3><DollarSign size={18} /> Top 10 - Faturamento</h3>
+          </div>
+          <div className="wintrack-table-container">
+            <table className="wintrack-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Produto</th>
+                  <th>Faturamento</th>
+                  <th>Qtd</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { id: 1, nome: 'Camisa Grêmio III 25/26 - Torcedor Umbro ...', faturamento: 949.50, qtd: 5 },
+                  { id: 2, nome: 'Camisa Grêmio I 25/26 - Torcedor Umbro ...', faturamento: 569.70, qtd: 3 },
+                  { id: 3, nome: 'Camisa Internacional I 24/25 - Torcedor Adid...', faturamento: 339.80, qtd: 2 },
+                ].map(p => (
+                  <tr key={p.id}>
+                    <td className="rank"><strong>{p.id}</strong></td>
+                    <td className="product-name">{p.nome}</td>
+                    <td className="revenue highlight">{formatCurrency(p.faturamento)}</td>
+                    <td className="quantity">{p.qtd}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      {/* VENDAS LIST */}
+      <div className="glass-panel section-panel">
+        <div className="flex-between header-row">
+          <h3><ShoppingCart size={18} /> Lista de Vendas</h3>
+          <div className="search-box">
+            <input type="text" placeholder="Buscar pedido..." className="search-input" />
+          </div>
+        </div>
+        <div className="wintrack-table-container" style={blurStyle}>
+          <table className="wintrack-table">
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Envio</th>
+                <th>Valor</th>
+                <th>Lucro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { id: '#137', data: '10/03/26', status: 'Pago', envio: 'Enviado', valor: 161.80, lucro: 151.90 },
+                { id: '#136', data: '08/03/26', status: 'Pago', envio: 'Enviado', valor: 206.91, lucro: 206.91 },
+                { id: '#135', data: '03/03/26', status: 'Pago', envio: 'Não Separado', valor: 399.80, lucro: 399.80 },
+              ].map((sale, i) => (
+                <tr key={i}>
+                  <td><strong>{sale.id}</strong></td>
+                  <td>{sale.data}</td>
+                  <td><span className="status-badge pago">{sale.status}</span></td>
+                  <td><span className="status-badge">{sale.envio}</span></td>
+                  <td className="price">{formatCurrency(sale.valor)}</td>
+                  <td className="revenue highlight">{formatCurrency(sale.lucro)}</td>
+                  <td>
+                    <div className="flex-center actions">
+                      <button className="icon-btn edit"><Pencil size={14} /></button>
+                      <button className="icon-btn delete"><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      {/* RESULTS TABLE */}
+      <div className="glass-panel section-panel">
+        <div className="flex-between header-row">
+          <h3><BarChart3 size={18} /> Tabela de Resultados Diário</h3>
+        </div>
+        <div className="wintrack-table-container" style={blurStyle}>
+          <table className="wintrack-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Investimento</th>
+                <th>Vendas</th>
+                <th>CPA</th>
+                <th>Faturamento</th>
+                <th>ROI</th>
+                <th>ROAS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(5)].map((_, i) => (
+                <tr key={i}>
+                  <td>15/03/2026</td>
+                  <td className="warning">R$ 0,00</td>
+                  <td className="quantity">36</td>
+                  <td>R$ 0,00</td>
+                  <td className="revenue highlight">R$ 8.200,16</td>
+                  <td className="success">0%</td>
+                  <td>-</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   );
 };
