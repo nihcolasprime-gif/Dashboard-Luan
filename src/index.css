@@ -513,6 +513,12 @@ h3 { font-size: 1.25rem; }
   font-size: 1.1rem;
   min-width: 140px;
   text-align: center;
+  color: var(--color-text);
+}
+
+[data-theme="company"] .month-selector .current-month,
+[data-theme="company"] .month-selector .icon-btn {
+  color: #fff;
 }
 
 .icon-btn-circle {
@@ -919,6 +925,14 @@ button {
   font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  align-items: start;
 }
 
 .data-grid-2 {
