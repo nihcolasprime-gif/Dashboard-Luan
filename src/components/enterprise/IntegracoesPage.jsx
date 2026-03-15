@@ -7,6 +7,8 @@ const IntegracoesPage = ({ oculto }) => {
 
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [nuvemshopStatus, setNuvemshopStatus] = useState('desconectado');
+  const [nuvemAppId, setNuvemAppId] = useState('');
+  const [nuvemSecret, setNuvemSecret] = useState('');
   const [syncStock, setSyncStock] = useState(true);
   const [syncOrders, setSyncOrders] = useState(true);
 
@@ -15,8 +17,9 @@ const IntegracoesPage = ({ oculto }) => {
   };
 
   const handleSaveConfig = () => {
-    // Simulando o redirect de auth e o retorno de sucesso
-    setNuvemshopStatus('conectado');
+    if (nuvemAppId && nuvemSecret) {
+      setNuvemshopStatus('conectado');
+    }
     setIsConfigOpen(false);
   };
 
@@ -83,13 +86,35 @@ const IntegracoesPage = ({ oculto }) => {
               </button>
             </div>
 
-            <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '1.5rem' }}>
-              <p className="text-muted" style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.5' }}>
-                O Wintrack funciona como o "cérebro" da sua operação. Ao conectar, você será redirecionado para a Nuvemshop para autorizar o acesso.
-              </p>
+            <div className="form-group" style={{ marginBottom: '1.2rem' }}>
+              <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>App ID da Nuvemshop</label>
+              <div className="input-with-icon" style={{ position: 'relative' }}>
+                <Key size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+                <input 
+                  type="text" 
+                  value={nuvemAppId}
+                  onChange={(e) => setNuvemAppId(e.target.value)}
+                  placeholder="Ex: 123456" 
+                  style={{ paddingLeft: '2.5rem', width: '100%', boxSizing: 'border-box' }}
+                />
+              </div>
             </div>
 
-            <h4 style={{ marginBottom: '1rem', fontSize: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>O que será sincronizado?</h4>
+            <div className="form-group" style={{ marginBottom: '2rem' }}>
+              <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Client Secret</label>
+              <div className="input-with-icon" style={{ position: 'relative' }}>
+                <KeyRound size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+                <input 
+                  type="password" 
+                  value={nuvemSecret}
+                  onChange={(e) => setNuvemSecret(e.target.value)}
+                  placeholder="Insira sua chave secreta" 
+                  style={{ paddingLeft: '2.5rem', width: '100%', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+
+            <h4 style={{ marginBottom: '1rem', fontSize: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>Configurações de Sincronização</h4>
             
             <div className="flex-between" style={{ marginBottom: '1rem', padding: '0.5rem 0' }}>
               <div>
@@ -119,10 +144,10 @@ const IntegracoesPage = ({ oculto }) => {
               </button>
             </div>
 
-            <div className="flex-between" style={{ marginTop: '1.5rem' }}>
+            <div className="flex-between" style={{ marginTop: '1rem' }}>
               <button className="btn-outline" onClick={() => setIsConfigOpen(false)}>Cancelar</button>
-              <button className="btn-primary" onClick={handleSaveConfig} style={{ background: 'var(--color-primary)', color: '#0d1b3e', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                Autorizar na Nuvemshop <Link2 size={16} />
+              <button className="btn-primary" onClick={handleSaveConfig} style={{ background: 'var(--color-primary)', color: '#0d1b3e' }}>
+                Salvar Configurações
               </button>
             </div>
           </div>
