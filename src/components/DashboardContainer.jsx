@@ -29,6 +29,19 @@ const DashboardContainer = () => {
   const [dadosVisiveis, setDadosVisiveis] = useState(true);
   const [activePage, setActivePage] = useState('overview');
 
+  // Capture Nuvemshop token from OAuth redirect URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('nuvem_token');
+    const userId = params.get('nuvem_user_id');
+    if (token) {
+      localStorage.setItem('nuvemshop_access_token', token);
+      if (userId) localStorage.setItem('nuvemshop_user_id', userId);
+      // Clean up the URL
+      window.history.replaceState({}, document.title, '/');
+    }
+  }, []);
+
   useEffect(() => {
     if (isCompanyMode) {
       document.body.setAttribute('data-theme', 'company');
@@ -36,6 +49,7 @@ const DashboardContainer = () => {
       document.body.removeAttribute('data-theme');
     }
   }, [isCompanyMode]);
+
 
   const triggerPortal = () => {
     setPortalActive(true);
