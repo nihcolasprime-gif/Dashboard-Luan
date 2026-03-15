@@ -4,12 +4,7 @@ import { Target, Flag, TrendingUp, CheckCircle2, Clock } from 'lucide-react';
 const MetasPage = ({ oculto }) => {
   const blurStyle = oculto ? { filter: 'blur(8px)' } : {};
 
-  const metas = [
-    { title: 'Faturamento Mensal', current: 'R$ 245k', target: 'R$ 300k', progress: 82, color: 'var(--color-primary)' },
-    { title: 'CAC (Custo Aquisição)', current: 'R$ 15', target: 'R$ 12', progress: 45, color: '#ef4444' },
-    { title: 'Novos Clientes', current: '1.240', target: '2.000', progress: 62, color: '#3b82f6' },
-    { title: 'Recuperação de Carrinho', current: '18%', target: '25%', progress: 72, color: 'var(--color-success)' },
-  ];
+  const metas = [];
 
   return (
     <div className="enterprise-page animate-fadeIn">
@@ -40,19 +35,11 @@ const MetasPage = ({ oculto }) => {
       <div className="glass-panel" style={{ padding: '2rem', ...blurStyle }}>
         <h3 style={{ marginBottom: '1.5rem' }}>Cronograma de Objetivos</h3>
         <div className="wintrack-list">
-          {[
-            { task: 'Lançamento Coleção Inverno', date: '15 Abr', status: 'pendente', icon: Clock },
-            { task: 'Integração Nuvemshop Pro', date: '20 Mar', status: 'concluido', icon: CheckCircle2 },
-            { task: 'Redução de 10% no CPC', date: '30 Mar', status: 'pendente', icon: TrendingUp },
-          ].map((item, idx) => (
-            <div key={idx} className="flex-between" style={{ padding: '1rem 0', borderBottom: idx < 2 ? '1px solid var(--color-border)' : 'none' }}>
+          {[{ task: 'Ainda não há cronograma definido.', date: '', status: '', icon: Clock }].map((item, idx) => (
+            <div key={idx} className="flex-between" style={{ padding: '1rem 0' }}>
               <div className="flex-center" style={{ gap: '1rem', justifyContent: 'flex-start' }}>
-                <item.icon size={18} color={item.status === 'concluido' ? 'var(--color-success)' : 'var(--color-warning)'} />
-                <span style={{ fontWeight: 500 }}>{item.task}</span>
-              </div>
-              <div className="flex-center" style={{ gap: '1.5rem' }}>
-                <span className="text-muted" style={{ fontSize: '0.85rem' }}>{item.date}</span>
-                <span className={`status-badge ${item.status === 'concluido' ? 'pago' : ''}`}>{item.status}</span>
+                <item.icon size={18} color="var(--color-text-muted)" />
+                <span style={{ fontWeight: 500, color: 'var(--color-text-muted)' }}>{item.task}</span>
               </div>
             </div>
           ))}

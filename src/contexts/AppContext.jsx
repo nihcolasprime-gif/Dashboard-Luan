@@ -13,13 +13,13 @@ export function AppProvider({ children }) {
   const [ecommerceStats, setEcommerceStats] = useState({
     orders: [],
     kpis: {
-      faturamento: 8190.26,
+      faturamento: 0,
       investimento: 0,
-      lucroBruto: 8064.56,
-      lucroSogra: 8064.56,
+      lucroBruto: 0,
+      lucroSogra: 0,
       roas: 0,
       cpa: 0,
-      vendas: 35
+      vendas: 0
     }
   });
 

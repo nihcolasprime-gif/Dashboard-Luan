@@ -113,6 +113,53 @@ h3 { font-size: 1.25rem; }
   overflow: hidden;
 }
 
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text);
+}
+
+[data-theme="company"] .sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.sidebar-item.active {
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+[data-theme="company"] .sidebar-item.active {
+  background: var(--brand-gold);
+  color: var(--brand-navy);
+}
+
+.sidebar-item .item-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.sidebar-item .label {
+  font-size: 0.95rem;
+}
+
 .main-content {
   flex: 1;
   display: flex;
@@ -425,6 +472,47 @@ h3 { font-size: 1.25rem; }
   border-radius: var(--radius-md);
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: rgba(0,0,0,0.05);
+  color: var(--color-text);
+}
+
+[data-theme="company"] .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+/* ======== MONTH SELECTOR ======== */
+.month-selector {
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-radius: 40px;
+  width: fit-content;
+}
+
+.current-month {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 140px;
+  text-align: center;
 }
 
 .icon-btn-circle {

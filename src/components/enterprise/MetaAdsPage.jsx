@@ -5,11 +5,7 @@ const MetaAdsPage = ({ oculto }) => {
   const [activeSubTab, setActiveSubTab] = useState('campanhas');
   const blurStyle = oculto ? { filter: 'blur(8px)' } : {};
 
-  const campaignStats = [
-    { name: 'Conversão Direta - Verão', reach: '1.2M', ctr: '1.85%', cpc: 'R$ 0,45', spent: 'R$ 15.000', roas: '6.2x' },
-    { name: 'Remarketing Dinâmico', reach: '450k', ctr: '3.20%', cpc: 'R$ 0,85', spent: 'R$ 8.000', roas: '4.5x' },
-    { name: 'Branding - Nação Esportes', reach: '5.8M', ctr: '0.90%', cpc: 'R$ 0,30', spent: 'R$ 20.000', roas: '1.2x' },
-  ];
+  const campaignStats = [];
 
   return (
     <div className="enterprise-page animate-fadeIn">
@@ -83,16 +79,24 @@ const MetaAdsPage = ({ oculto }) => {
               </tr>
             </thead>
             <tbody>
-              {campaignStats.map((c, idx) => (
-                <tr key={idx}>
-                  <td className="main-value">{c.name}</td>
-                  <td>{c.reach}</td>
-                  <td>{c.ctr}</td>
-                  <td>{c.cpc}</td>
-                  <td>{c.spent}</td>
-                  <td className="highlight success">{c.roas}</td>
+              {campaignStats.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }} className="text-muted">
+                    Ainda não há campanhas ativas.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                campaignStats.map((c, idx) => (
+                  <tr key={idx}>
+                    <td className="main-value">{c.name}</td>
+                    <td>{c.reach}</td>
+                    <td>{c.ctr}</td>
+                    <td>{c.cpc}</td>
+                    <td>{c.spent}</td>
+                    <td className="highlight success">{c.roas}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

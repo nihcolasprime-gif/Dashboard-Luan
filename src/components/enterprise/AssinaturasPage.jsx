@@ -54,19 +54,11 @@ const AssinaturasPage = ({ oculto }) => {
               </tr>
             </thead>
             <tbody>
-              {[
-                { plan: 'Plano Pro Anual', user: 'Ricardo Montes', date: 'Hoje', val: 'R$ 1.200,00', st: 'Ativo' },
-                { plan: 'Plano Lite Mensal', user: 'Juliana Paes', date: 'Ontem', val: 'R$ 89,90', st: 'Ativo' },
-                { plan: 'Plano Pro Mensal', user: 'Fábio Assunção', date: '12 Mar', val: 'R$ 199,00', st: 'Pendente' },
-              ].map((sub, i) => (
-                <tr key={i}>
-                  <td style={{ fontWeight: 600 }}>{sub.plan}</td>
-                  <td>{sub.user}</td>
-                  <td className="text-muted">{sub.date}</td>
-                  <td>{sub.val}</td>
-                  <td><span className={`status-badge ${sub.st === 'Ativo' ? 'pago' : ''}`}>{sub.st}</span></td>
-                </tr>
-              ))}
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }} className="text-muted">
+                  Ainda não há assinaturas ativas.
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>

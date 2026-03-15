@@ -4,13 +4,6 @@ import { Users, UserPlus, Search, Filter, MoreVertical } from 'lucide-react';
 const CadastrosPage = ({ oculto }) => {
   const blurStyle = oculto ? { filter: 'blur(8px)' } : {};
 
-  const customers = [
-    { name: 'Luan Silva', email: 'luan@email.com', type: 'VIP', spent: 'R$ 15.420,00', orders: 24 },
-    { name: 'Ana Souza', email: 'ana@email.com', type: 'Novo', spent: 'R$ 540,00', orders: 1 },
-    { name: 'Marcos Oliveira', email: 'marcos@email.com', type: 'Recorrente', spent: 'R$ 4.200,00', orders: 8 },
-    { name: 'Carla Dias', email: 'carla@email.com', type: 'VIP', spent: 'R$ 12.100,00', orders: 15 },
-  ];
-
   return (
     <div className="enterprise-page animate-fadeIn">
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
@@ -47,29 +40,11 @@ const CadastrosPage = ({ oculto }) => {
               </tr>
             </thead>
             <tbody>
-              {customers.map((c, idx) => (
-                <tr key={idx}>
-                  <td>
-                    <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '0.75rem' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(226, 176, 83, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
-                        {c.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 600 }}>{c.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{c.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${c.type === 'VIP' ? 'pago' : ''}`}>{c.type}</span>
-                  </td>
-                  <td style={{ fontWeight: 600 }}>{c.spent}</td>
-                  <td>{c.orders}</td>
-                  <td style={{ textAlign: 'right' }}>
-                    <button className="icon-btn" style={{ padding: '0.5rem' }}><MoreVertical size={16} /></button>
-                  </td>
-                </tr>
-              ))}
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }} className="text-muted">
+                  Ainda não há clientes cadastrados.
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
