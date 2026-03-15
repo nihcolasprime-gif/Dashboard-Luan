@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { isConnected, fetchOrders, calcKpisFromOrders } from '../services/nuvemshop';
 
 const AppContext = createContext();
 
@@ -47,14 +48,16 @@ export function AppProvider({ children }) {
         sRes.data.forEach(s => { sObj[s.escopo] = s.valor; });
         setSaldos(sObj);
       }
-      
-      // Update ecommerce stats with real data if available, or keep mock
-      if (tRes.data) {
-        const orders = tRes.data.filter(x => x.escopo === 'empresa' && x.tipo === 'receita');
-        setEcommerceStats(prev => ({
-          ...prev,
-          orders: orders
-        }));
+
+      // Load real Nuvemshop data if connected
+      if (isConnected()) {
+        try {
+          const orders = await fetchOrders();
+          const kpis = calcKpisFromOrders(orders);
+          setEcommerceStats({ orders, kpis });
+        } catch (nuvemErr) {
+          console.warn('Erro ao carregar Nuvemshop (token pode ter expirado):', nuvemErr.message);
+        }
       }
     } catch (err) {
       console.error('Erro ao carregar dados:', err);

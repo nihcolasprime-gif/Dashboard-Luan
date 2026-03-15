@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link2, RefreshCw, CheckCircle2, AlertCircle, ShoppingCart, Facebook, Globe, X, Key, KeyRound, ToggleRight, ToggleLeft } from 'lucide-react';
-import { NuvemshopService } from '../../services/NuvemshopService';
+import { isConnected } from '../../services/nuvemshop';
 
 const IntegracoesPage = ({ oculto }) => {
   const blurStyle = oculto ? { filter: 'blur(8px)' } : {};
 
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [nuvemshopStatus, setNuvemshopStatus] = useState('desconectado');
+  const [nuvemshopStatus, setNuvemshopStatus] = useState(isConnected() ? 'conectado' : 'desconectado');
   const [nuvemAppId, setNuvemAppId] = useState(import.meta.env.VITE_NUVEMSHOP_APP_ID || '');
   const [nuvemSecret, setNuvemSecret] = useState(import.meta.env.VITE_NUVEMSHOP_CLIENT_SECRET || '');
   const [syncStock, setSyncStock] = useState(true);
