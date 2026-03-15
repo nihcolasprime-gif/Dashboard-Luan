@@ -50,12 +50,12 @@ const CompanyDashboard = ({ oculto = false }) => {
   };
 
   const kpis = [
-    { label: 'Faturamento', value: formatCurrency(ecommerceStats.kpis.faturamento), sub: 'Sem meta', icon: DollarSign },
-    { label: 'Investimento', value: formatCurrency(ecommerceStats.kpis.investimento), sub: 'Sem meta', icon: ShoppingCart },
-    { label: 'Lucro Bruto', value: formatCurrency(ecommerceStats.kpis.lucroBruto), sub: 'Margem: 0%', icon: TrendingUp },
-    { label: 'Lucro sogra', value: formatCurrency(ecommerceStats.kpis.lucroSogra), sub: '36 vendas', icon: Calculator },
-    { label: 'ROAS', value: ecommerceStats.kpis.roas || '-', sub: 'Pode melhorar', icon: Target },
-    { label: 'Contador (CPA)', value: formatCurrency(ecommerceStats.kpis.cpa), sub: 'Custo por', icon: Receipt },
+    { label: 'Faturamento', value: formatCurrency(ecommerceStats.kpis.faturamento || 0), sub: '', icon: DollarSign },
+    { label: 'Investimento', value: formatCurrency(ecommerceStats.kpis.investimento || 0), sub: '', icon: ShoppingCart },
+    { label: 'Lucro Bruto', value: formatCurrency(ecommerceStats.kpis.lucroBruto || 0), sub: '', icon: TrendingUp },
+    { label: 'Lucro Líquido', value: formatCurrency(ecommerceStats.kpis.lucroSogra || 0), sub: '', icon: Calculator },
+    { label: 'ROAS', value: ecommerceStats.kpis.roas || '-', sub: '', icon: Target },
+    { label: 'CPA', value: formatCurrency(ecommerceStats.kpis.cpa || 0), sub: '', icon: Receipt },
   ];
 
   const manualExpenses = transacoes.filter(t => t.escopo === 'empresa' && t.tipo === 'despesa');
@@ -159,7 +159,7 @@ const CompanyDashboard = ({ oculto = false }) => {
             </div>
             <div className="stat-row">
               <span className="text-muted">Total de Vendas</span>
-              <span className="stat-value highlight">36</span>
+              <span className="stat-value highlight">0</span>
             </div>
           </div>
         </div>
@@ -183,11 +183,8 @@ const CompanyDashboard = ({ oculto = false }) => {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { id: 1, nome: 'Camisa Grêmio III 25/26 - Torcedor Umbro Mas...', qtd: 5, valor: 189.90 },
-                  { id: 2, nome: 'Camisa Grêmio I 25/26 - Torcedor Umbro Mas...', qtd: 3, valor: 189.90 },
-                  { id: 3, nome: 'Camisa Internacional I 24/25 - Torcedor Adidas...', qtd: 2, valor: 169.90 },
-                ].map(p => (
+                {/* Integração Nuvemshop vazia */}
+                {[].map(p => (
                   <tr key={p.id}>
                     <td className="rank"><strong>{p.id}</strong></td>
                     <td className="product-name">{p.nome}</td>
@@ -215,11 +212,8 @@ const CompanyDashboard = ({ oculto = false }) => {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { id: 1, nome: 'Camisa Grêmio III 25/26 - Torcedor Umbro ...', faturamento: 949.50, qtd: 5 },
-                  { id: 2, nome: 'Camisa Grêmio I 25/26 - Torcedor Umbro ...', faturamento: 569.70, qtd: 3 },
-                  { id: 3, nome: 'Camisa Internacional I 24/25 - Torcedor Adid...', faturamento: 339.80, qtd: 2 },
-                ].map(p => (
+                {/* Integração Nuvemshop vazia */}
+                {[].map(p => (
                   <tr key={p.id}>
                     <td className="rank"><strong>{p.id}</strong></td>
                     <td className="product-name">{p.nome}</td>
@@ -256,11 +250,8 @@ const CompanyDashboard = ({ oculto = false }) => {
               </tr>
             </thead>
             <tbody>
-              {[
-                { id: '#137', data: '10/03/26', status: 'Pago', envio: 'Enviado', valor: 161.80, lucro: 151.90 },
-                { id: '#136', data: '08/03/26', status: 'Pago', envio: 'Enviado', valor: 206.91, lucro: 206.91 },
-                { id: '#135', data: '03/03/26', status: 'Pago', envio: 'Não Separado', valor: 399.80, lucro: 399.80 },
-              ].map((sale, i) => (
+              {/* Integração Nuvemshop vazia */}
+              {[].map((sale, i) => (
                 <tr key={i}>
                   <td><strong>{sale.id}</strong></td>
                   <td>{sale.data}</td>
@@ -301,13 +292,14 @@ const CompanyDashboard = ({ oculto = false }) => {
               </tr>
             </thead>
             <tbody>
-              {[...Array(5)].map((_, i) => (
+              {/* Integração Nuvemshop vazia */}
+              {[].map((_, i) => (
                 <tr key={i}>
                   <td>15/03/2026</td>
                   <td className="warning">R$ 0,00</td>
-                  <td className="quantity">36</td>
+                  <td className="quantity">0</td>
                   <td>R$ 0,00</td>
-                  <td className="revenue highlight">R$ 8.200,16</td>
+                  <td className="revenue highlight">R$ 0,00</td>
                   <td className="success">0%</td>
                   <td>-</td>
                 </tr>

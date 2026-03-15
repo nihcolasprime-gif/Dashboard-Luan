@@ -949,6 +949,20 @@ button {
   margin-top: var(--space-lg);
 }
 
+@media (max-width: 1024px) {
+  .grid-2, .data-grid-2, .data-grid-equal {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
 .items-list {
   display: flex;
   flex-direction: column;
