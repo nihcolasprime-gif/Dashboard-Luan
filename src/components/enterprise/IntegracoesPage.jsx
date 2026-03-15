@@ -151,10 +151,11 @@ const IntegracoesPage = ({ oculto }) => {
 
             <div className="flex-between" style={{ marginTop: '1rem' }}>
               <button className="btn-outline" onClick={() => setIsConfigOpen(false)}>Cancelar</button>
-              <button className="btn-primary" onClick={handleSaveConfig} style={{ background: 'var(--color-primary)', color: '#0d1b3e' }}>
-                Salvar Configurações
+              <button className="btn-primary" onClick={handleDisconnect} style={{ background: 'var(--color-danger, #e74c3c)', color: '#fff' }}>
+                Desconectar
               </button>
             </div>
+
           </div>
         </div>
       )}

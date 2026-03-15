@@ -58,7 +58,25 @@ const CompanyDashboard = ({ oculto = false }) => {
     { label: 'CPA', value: formatCurrency(ecommerceStats.kpis.cpa || 0), sub: '', icon: Receipt },
   ];
 
+  const allOrders = ecommerceStats.orders || [];
   const manualExpenses = transacoes.filter(t => t.escopo === 'empresa' && t.tipo === 'despesa');
+
+  // Build top products from real order line items
+  const productMap = {};
+  allOrders.forEach(order => {
+    if (!order.products) return;
+    order.products.forEach(item => {
+      const name = item.name || 'Produto sem nome';
+      if (!productMap[name]) productMap[name] = { nome: name, qtd: 0, faturamento: 0 };
+      productMap[name].qtd += item.quantity || 0;
+      productMap[name].faturamento += parseFloat(item.price || 0) * (item.quantity || 1);
+    });
+  });
+  const topProdutos = Object.values(productMap)
+    .sort((a, b) => b.faturamento - a.faturamento)
+    .slice(0, 10)
+    .map((p, i) => ({ ...p, id: i + 1 }));
+  const topProdutosQtd = [...topProdutos].sort((a, b) => b.qtd - a.qtd);
 
   return (
     <div className="wintrack-theme">
@@ -182,17 +200,18 @@ const CompanyDashboard = ({ oculto = false }) => {
                   <th>Valor</th>
                 </tr>
               </thead>
-              <tbody>
-                {/* Integração Nuvemshop vazia */}
-                {[].map(p => (
+               <tbody>
+                {topProdutosQtd.length === 0 ? (
+                  <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '1.5rem' }}>Conecte a Nuvemshop para ver os produtos</td></tr>
+                ) : topProdutosQtd.map(p => (
                   <tr key={p.id}>
                     <td className="rank"><strong>{p.id}</strong></td>
                     <td className="product-name">{p.nome}</td>
                     <td className="quantity">{p.qtd}</td>
-                    <td className="price">{formatCurrency(p.valor)}</td>
+                    <td className="price">{formatCurrency(p.faturamento)}</td>
                   </tr>
                 ))}
-              </tbody>
+               </tbody>
             </table>
           </div>
         </div>
@@ -211,9 +230,10 @@ const CompanyDashboard = ({ oculto = false }) => {
                   <th>Qtd</th>
                 </tr>
               </thead>
-              <tbody>
-                {/* Integração Nuvemshop vazia */}
-                {[].map(p => (
+               <tbody>
+                {topProdutos.length === 0 ? (
+                  <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '1.5rem' }}>Nenhum dado disponível</td></tr>
+                ) : topProdutos.map(p => (
                   <tr key={p.id}>
                     <td className="rank"><strong>{p.id}</strong></td>
                     <td className="product-name">{p.nome}</td>
@@ -221,7 +241,7 @@ const CompanyDashboard = ({ oculto = false }) => {
                     <td className="quantity">{p.qtd}</td>
                   </tr>
                 ))}
-              </tbody>
+               </tbody>
             </table>
           </div>
         </div>
@@ -250,21 +270,17 @@ const CompanyDashboard = ({ oculto = false }) => {
               </tr>
             </thead>
             <tbody>
-              {/* Integração Nuvemshop vazia */}
-              {[].map((sale, i) => (
-                <tr key={i}>
-                  <td><strong>{sale.id}</strong></td>
-                  <td>{sale.data}</td>
-                  <td><span className="status-badge pago">{sale.status}</span></td>
-                  <td><span className="status-badge">{sale.envio}</span></td>
-                  <td className="price">{formatCurrency(sale.valor)}</td>
-                  <td className="revenue highlight">{formatCurrency(sale.lucro)}</td>
-                  <td>
-                    <div className="flex-center actions">
-                      <button className="icon-btn edit"><Pencil size={14} /></button>
-                      <button className="icon-btn delete"><Trash2 size={14} /></button>
-                    </div>
-                  </td>
+              {allOrders.length === 0 ? (
+                <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '1.5rem' }}>Conecte a Nuvemshop para ver os pedidos</td></tr>
+              ) : allOrders.slice(0, 50).map((sale, i) => (
+                <tr key={sale.id || i}>
+                  <td><strong>#{sale.number || sale.id}</strong></td>
+                  <td>{sale.created_at ? new Date(sale.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                  <td><span className={`status-badge ${sale.payment_status === 'paid' ? 'pago' : ''}`}>{sale.payment_status || '-'}</span></td>
+                  <td><span className="status-badge">{sale.shipping_status || '-'}</span></td>
+                  <td className="price">{formatCurrency(parseFloat(sale.total || 0))}</td>
+                  <td className="revenue highlight">-</td>
+                  <td><div className="flex-center actions"><button className="icon-btn edit"><Pencil size={14} /></button></div></td>
                 </tr>
               ))}
             </tbody>
