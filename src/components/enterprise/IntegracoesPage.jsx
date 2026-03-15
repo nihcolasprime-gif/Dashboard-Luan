@@ -7,8 +7,8 @@ const IntegracoesPage = ({ oculto }) => {
 
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [nuvemshopStatus, setNuvemshopStatus] = useState('desconectado');
-  const [nuvemAppId, setNuvemAppId] = useState('');
-  const [nuvemSecret, setNuvemSecret] = useState('');
+  const [nuvemAppId, setNuvemAppId] = useState(import.meta.env.VITE_NUVEMSHOP_APP_ID || '');
+  const [nuvemSecret, setNuvemSecret] = useState(import.meta.env.VITE_NUVEMSHOP_CLIENT_SECRET || '');
   const [syncStock, setSyncStock] = useState(true);
   const [syncOrders, setSyncOrders] = useState(true);
 
