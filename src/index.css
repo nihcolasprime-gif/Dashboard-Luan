@@ -999,6 +999,7 @@ button {
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
   font-weight: 500;
+  color: #ffffff;
 }
 
 .tag-actions {
@@ -1010,11 +1011,11 @@ button {
 
 .tag-btn {
   background: transparent;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.6);
   padding: 2px;
   border-radius: 4px;
 }
-.tag-btn:hover { background: rgba(0,0,0,0.1); color: var(--color-text); }
+.tag-btn:hover { background: rgba(255,255,255,0.1); color: #ffffff; }
 .tag-btn.danger:hover { background: var(--color-danger-bg); color: var(--color-danger); }
 
 
