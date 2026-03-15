@@ -37,25 +37,25 @@ const MetaAdsPage = ({ oculto }) => {
       <div className="wintrack-kpi-grid" style={blurStyle}>
         <div className="wintrack-card gold-border glass-panel">
           <div className="label">ROAS Médio</div>
-          <div className="value">4.85x</div>
-          <div className="sub-value success">Dentro da meta otimizada</div>
+          <div className="value">0.00x</div>
+          <div className="sub-value success">-</div>
           <div className="icon-box"><TrendingUp size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">Investimento (Mensal)</div>
-          <div className="value">R$ 43.000,00</div>
-          <div className="sub-value">Orçamento: R$ 50.000,00</div>
+          <div className="value">R$ 0,00</div>
+          <div className="sub-value">Orçamento: -</div>
           <div className="icon-box"><DollarSign size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">CTR Médio</div>
-          <div className="value">1.42%</div>
-          <div className="sub-value">+0.2% vs semana passada</div>
+          <div className="value">0.00%</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><MousePointer2 size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">Alcance Único</div>
-          <div className="value">7.5M</div>
+          <div className="value">0</div>
           <div className="sub-value">Pessoas impactadas</div>
           <div className="icon-box"><Eye size={20} /></div>
         </div>

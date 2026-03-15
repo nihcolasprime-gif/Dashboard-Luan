@@ -16,26 +16,26 @@ const AssinaturasPage = ({ oculto }) => {
       <div className="wintrack-kpi-grid" style={{ marginBottom: '2.5rem', ...blurStyle }}>
         <div className="wintrack-card gold-border">
           <div className="label">MRR (Recorrência Mensal)</div>
-          <div className="value">R$ 12.850,00</div>
-          <div className="sub-value" style={{ color: 'var(--color-success)' }}>+8% este mês</div>
+          <div className="value">R$ 0,00</div>
+          <div className="sub-value" style={{ color: 'var(--color-success)' }}>-</div>
           <div className="icon-box"><Repeat size={20} /></div>
         </div>
         <div className="wintrack-card">
           <div className="label">Churn Rate</div>
-          <div className="value">1.2%</div>
-          <div className="sub-value">Meta: abaixo de 2%</div>
+          <div className="value">0.0%</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><ShieldCheck size={20} /></div>
         </div>
         <div className="wintrack-card">
           <div className="label">LTV (Lifetime Value)</div>
-          <div className="value">R$ 2.450,00</div>
-          <div className="sub-value">Duração média: 14 meses</div>
+          <div className="value">R$ 0,00</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><TrendingUp size={20} /></div>
         </div>
         <div className="wintrack-card">
           <div className="label">Assinantes Ativos</div>
-          <div className="value">154</div>
-          <div className="sub-value">Plano Pro: 120 | Lite: 34</div>
+          <div className="value">0</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><BarChart size={20} /></div>
         </div>
       </div>

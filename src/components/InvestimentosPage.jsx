@@ -6,16 +6,18 @@ import InvestimentoModal from './InvestimentoModal';
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-const InvestimentosPage = ({ oculto }) => {
+const InvestimentosPage = ({ escopo = 'pessoal', oculto }) => {
   const { investimentos, addInvestimento, updateInvestimento, deleteInvestimento } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredInvestimentos = investimentos.filter(inv => 
-    inv.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    inv.corretora?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInvestimentos = investimentos.filter(inv => {
+    const invEscopo = inv.escopo || 'pessoal';
+    if (invEscopo !== escopo) return false;
+    return inv.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+           inv.corretora?.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const totalInvestido = filteredInvestimentos.reduce((sum, inv) => sum + inv.valor, 0);
 
@@ -23,7 +25,7 @@ const InvestimentosPage = ({ oculto }) => {
     if (editData) {
       updateInvestimento(editData.id, data);
     } else {
-      addInvestimento(data);
+      addInvestimento({ ...data, escopo });
     }
     setEditData(null);
   };

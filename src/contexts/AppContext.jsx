@@ -103,7 +103,7 @@ export function AppProvider({ children }) {
   // ======== INVESTIMENTOS CRUD ========
   const addInvestimento = useCallback(async (inv) => {
     const { data, error } = await supabase.from('investimentos').insert([{
-      nome: inv.nome, valor: inv.valor, retorno: inv.retorno
+      nome: inv.nome, valor: inv.valor, retorno: inv.retorno, escopo: inv.escopo || 'pessoal'
     }]).select();
     if (data) setInvestimentos(prev => [...prev, data[0]]);
     if (error) console.error(error);

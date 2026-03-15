@@ -61,6 +61,8 @@ const DashboardContainer = () => {
         case 'cadastros': return <CadastrosPage oculto={!dadosVisiveis} />;
         case 'assinaturas': return <AssinaturasPage oculto={!dadosVisiveis} />;
         case 'configuracoes': return <ConfiguracoesPage oculto={!dadosVisiveis} />;
+        case 'transacoes-empresa': return <TransacoesPage escopo="empresa" oculto={!dadosVisiveis} />;
+        case 'investimentos-empresa': return <InvestimentosPage escopo="empresa" oculto={!dadosVisiveis} />;
         default: return <CompanyDashboard oculto={!dadosVisiveis} />;
       }
     }

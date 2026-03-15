@@ -18,26 +18,26 @@ const FinanceiroEmpresaPage = ({ oculto }) => {
       <div className="wintrack-kpi-grid" style={blurStyle}>
         <div className="wintrack-card gold-border glass-panel">
           <div className="label">Saldo em Conta</div>
-          <div className="value">R$ 1.540.230,00</div>
-          <div className="sub-value">Distribuído em 3 bancos</div>
+          <div className="value">R$ 0,00</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><Landmark size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">Entradas (Mês)</div>
-          <div className="value success">R$ 480.000,00</div>
-          <div className="sub-value success">+15% vs mês anterior</div>
+          <div className="value success">R$ 0,00</div>
+          <div className="sub-value success">-</div>
           <div className="icon-box"><ArrowUpCircle size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">Saídas (Mês)</div>
-          <div className="value danger">R$ 120.000,00</div>
-          <div className="sub-value danger">-4% (Otimização de custos)</div>
+          <div className="value danger">R$ 0,00</div>
+          <div className="sub-value danger">-</div>
           <div className="icon-box"><ArrowDownCircle size={20} /></div>
         </div>
         <div className="wintrack-card glass-panel">
           <div className="label">Margem Líquida</div>
-          <div className="value">32%</div>
-          <div className="sub-value">Meta anual: 35%</div>
+          <div className="value">0%</div>
+          <div className="sub-value">-</div>
           <div className="icon-box"><PieChart size={20} /></div>
         </div>
       </div>
