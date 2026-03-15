@@ -1,8 +1,6 @@
 // Nuvemshop API Service
-// Reads token and user_id from localStorage (set by OAuth callback)
-
-const BASE_URL = 'https://api.tiendanube.com/v1';
-const USER_AGENT = 'NacaoDados (Luanframos25@gmail.com)';
+// Routes all API calls through /api/nuvemshop/proxy (Vercel Serverless Function)
+// to avoid CORS issues when calling the Nuvemshop API directly from the browser.
 
 function getCredentials() {
   const token = localStorage.getItem('nuvemshop_access_token');
@@ -10,53 +8,39 @@ function getCredentials() {
   return { token, userId };
 }
 
-function getHeaders() {
-  const { token } = getCredentials();
-  return {
-    'Authentication': `bearer ${token}`,
-    'User-Agent': USER_AGENT,
-    'Content-Type': 'application/json',
-  };
-}
-
 export function isConnected() {
   const { token, userId } = getCredentials();
   return !!(token && userId);
 }
 
-export async function fetchOrders(params = {}) {
-  const { userId } = getCredentials();
-  if (!userId) throw new Error('Nuvemshop não conectada');
+export function disconnect() {
+  localStorage.removeItem('nuvemshop_access_token');
+  localStorage.removeItem('nuvemshop_user_id');
+}
 
-  const query = new URLSearchParams({ per_page: 50, ...params }).toString();
-  const res = await fetch(`${BASE_URL}/${userId}/orders?${query}`, {
-    headers: getHeaders(),
-  });
-  if (!res.ok) throw new Error(`Erro ao buscar pedidos: ${res.status}`);
+async function proxyFetch(path, params = {}) {
+  const { token, userId } = getCredentials();
+  if (!token || !userId) throw new Error('Nuvemshop não conectada');
+
+  const query = new URLSearchParams({ path, userId, token, per_page: 50, ...params }).toString();
+  const res = await fetch(`/api/nuvemshop/proxy?${query}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Erro ${res.status}`);
+  }
   return res.json();
+}
+
+export async function fetchOrders(params = {}) {
+  return proxyFetch('orders', params);
 }
 
 export async function fetchProducts(params = {}) {
-  const { userId } = getCredentials();
-  if (!userId) throw new Error('Nuvemshop não conectada');
-
-  const query = new URLSearchParams({ per_page: 50, ...params }).toString();
-  const res = await fetch(`${BASE_URL}/${userId}/products?${query}`, {
-    headers: getHeaders(),
-  });
-  if (!res.ok) throw new Error(`Erro ao buscar produtos: ${res.status}`);
-  return res.json();
+  return proxyFetch('products', params);
 }
 
 export async function fetchStoreInfo() {
-  const { userId } = getCredentials();
-  if (!userId) throw new Error('Nuvemshop não conectada');
-
-  const res = await fetch(`${BASE_URL}/${userId}/store`, {
-    headers: getHeaders(),
-  });
-  if (!res.ok) throw new Error(`Erro ao buscar dados da loja: ${res.status}`);
-  return res.json();
+  return proxyFetch('store');
 }
 
 // Calculate KPIs from real order data
@@ -70,11 +54,18 @@ export function calcKpisFromOrders(orders = []) {
 
   return {
     faturamento,
-    investimento: 0, // Needs Meta Ads integration
-    lucroBruto: faturamento, // Without cost data
-    lucroSogra: faturamento, // Without cost data
+    investimento: 0,
+    lucroBruto: faturamento,
+    lucroSogra: faturamento,
     roas: 0,
     cpa: 0,
     vendas: totalVendas,
   };
+}
+
+// Build the Nuvemshop OAuth install URL for the connect button
+export function getInstallUrl() {
+  const storeAdminUrl = 'https://nacaoesportes2.lojavirtualnuvem.com.br';
+  const appId = import.meta.env.VITE_NUVEMSHOP_APP_ID || '27805';
+  return `${storeAdminUrl}/admin/apps/${appId}/authorize`;
 }

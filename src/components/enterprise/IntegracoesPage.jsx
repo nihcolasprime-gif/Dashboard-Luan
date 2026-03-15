@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link2, RefreshCw, CheckCircle2, AlertCircle, ShoppingCart, Facebook, Globe, X, Key, KeyRound, ToggleRight, ToggleLeft } from 'lucide-react';
-import { isConnected } from '../../services/nuvemshop';
+import { Link2, RefreshCw, CheckCircle2, AlertCircle, ShoppingCart, Facebook, Globe, X, ToggleRight } from 'lucide-react';
+import { isConnected, disconnect, getInstallUrl } from '../../services/nuvemshop';
 
 const IntegracoesPage = ({ oculto }) => {
   const blurStyle = oculto ? { filter: 'blur(8px)' } : {};
@@ -13,13 +13,18 @@ const IntegracoesPage = ({ oculto }) => {
   const [syncOrders, setSyncOrders] = useState(true);
 
   const handleNuvemshopClick = () => {
-    setIsConfigOpen(true);
+    if (nuvemshopStatus === 'conectado') {
+      // Show disconnect confirmation
+      setIsConfigOpen(true);
+    } else {
+      // Start OAuth flow — redirect to Nuvemshop store install URL
+      window.location.href = getInstallUrl();
+    }
   };
 
-  const handleSaveConfig = () => {
-    if (nuvemAppId && nuvemSecret) {
-      setNuvemshopStatus('conectado');
-    }
+  const handleDisconnect = () => {
+    disconnect();
+    setNuvemshopStatus('desconectado');
     setIsConfigOpen(false);
   };
 
