@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Pencil, Trash2, TrendingUp, TrendingDown, Search } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import TransacaoModal from './TransacaoModal';
 
@@ -11,13 +11,14 @@ const TransacoesPage = ({ escopo, oculto }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const categoriasAgrupadas = getCategoriasGrouped();
 
   const escopoTransacoes = transacoes.filter(t => t.escopo === escopo);
 
-  const filtered = filtroTipo === 'todos' ? escopoTransacoes
-    : escopoTransacoes.filter(t => t.tipo === filtroTipo);
+  const filtered = (filtroTipo === 'todos' ? escopoTransacoes : escopoTransacoes.filter(t => t.tipo === filtroTipo))
+    .filter(t => t.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || t.categoria?.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleSave = (data) => {
     if (editData) {

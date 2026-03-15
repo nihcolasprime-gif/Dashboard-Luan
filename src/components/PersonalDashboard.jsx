@@ -2,18 +2,35 @@ import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, Plus, Pencil, X } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useApp } from '../contexts/AppContext';
+import TransacaoModal from './TransacaoModal';
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+const CATEGORIAS = {
+  receita: ['Salário', 'Investimentos', 'Rendimentos', 'Outros'],
+  despesa: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Outros']
+};
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const PersonalDashboard = ({ oculto = false }) => {
-  const { transacoes, categorias, investimentos, parcelas, addCategoria, updateCategoria, deleteCategoria } = useApp();
+  const { transacoes, categorias, investimentos, parcelas, addCategoria, updateCategoria, deleteCategoria, addTransacao, updateTransacao } = useApp();
   const now = new Date();
   const [mesSelecionado, setMesSelecionado] = useState(now.getMonth());
   const [anoSelecionado, setAnoSelecionado] = useState(now.getFullYear());
   const [newCategory, setNewCategory] = useState('');
+
+  // Modals
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('receita');
+  const [editItem, setEditItem] = useState(null);
+
+  const handleOpenModal = (tipo) => {
+    setModalType(tipo);
+    setEditItem(null);
+    setModalOpen(true);
+  };
 
   const mudarMes = (delta) => {
     let novoMes = mesSelecionado + delta;
@@ -71,10 +88,16 @@ const PersonalDashboard = ({ oculto = false }) => {
       </div>
 
 
-      {/* PAGE HEADER */}
       <div className="dashboard-hero">
         <h1 className="hero-title">Controle Pessoal</h1>
-        <p className="text-muted">Análise detalhada do período selecionado.</p>
+        <div className="hero-actions">
+          <button className="btn-premium btn-danger" onClick={() => handleOpenModal('despesa')}>
+            <TrendingDown size={20} /> <span>Nova Despesa</span>
+          </button>
+          <button className="btn-premium btn-primary" onClick={() => handleOpenModal('receita')}>
+            <TrendingUp size={20} /> <span>Nova Receita</span>
+          </button>
+        </div>
       </div>
 
 
@@ -114,7 +137,7 @@ const PersonalDashboard = ({ oculto = false }) => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px' }} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -181,7 +204,7 @@ const PersonalDashboard = ({ oculto = false }) => {
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
                 <XAxis type="number" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text-muted)', fontSize: 11 }} />
                 <YAxis type="category" dataKey="nome" axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text)', fontSize: 12, fontWeight: 500 }} width={80} />
-                <Tooltip formatter={(value) => [formatCurrency(value), 'Valor']} contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px' }} />
+                <Tooltip formatter={(value) => [formatCurrency(value), 'Valor']} contentStyle={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '12px' }} />
                 <Bar dataKey="valor" fill="var(--color-warning)" radius={[0, 6, 6, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
@@ -255,6 +278,21 @@ const PersonalDashboard = ({ oculto = false }) => {
 
         </div>
       </div>
+      
+      <TransacaoModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={(data) => {
+          if (editItem) {
+            updateTransacao(editItem.id, { ...data, tipo: modalType });
+          } else {
+            addTransacao({ ...data, tipo: modalType, data: new Date().toISOString() });
+          }
+        }}
+        editData={editItem}
+        categorias={CATEGORIAS[modalType]}
+        escopo="pessoal"
+      />
     </div>
   );
 };

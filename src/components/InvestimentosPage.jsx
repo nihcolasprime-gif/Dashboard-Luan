@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, TrendingUp, DollarSign } from 'lucide-react';
+import { Plus, Pencil, Trash2, TrendingUp, DollarSign, Search } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import InvestimentoModal from './InvestimentoModal';
 
@@ -10,8 +10,14 @@ const InvestimentosPage = ({ oculto }) => {
   const { investimentos, addInvestimento, updateInvestimento, deleteInvestimento } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const totalInvestido = investimentos.reduce((sum, inv) => sum + inv.valor, 0);
+  const filteredInvestimentos = investimentos.filter(inv => 
+    inv.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    inv.corretora?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalInvestido = filteredInvestimentos.reduce((sum, inv) => sum + inv.valor, 0);
 
   const handleSave = (data) => {
     if (editData) {
@@ -55,6 +61,8 @@ const InvestimentosPage = ({ oculto }) => {
               type="text"
               placeholder="Buscar ativo/corretora..."
               className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button className="btn-premium btn-primary" onClick={() => setModalOpen(true)}>
@@ -98,7 +106,7 @@ const InvestimentosPage = ({ oculto }) => {
                 </tr>
               </thead>
               <tbody>
-                {investimentos.map(inv => (
+                {filteredInvestimentos.map(inv => (
                   <tr key={inv.id}>
                     <td><strong>{inv.nome}</strong></td>
                     <td>{inv.corretora}</td>

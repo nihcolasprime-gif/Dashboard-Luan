@@ -2,20 +2,38 @@ import React, { useState } from 'react';
 import { 
   TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight, 
   ShoppingCart, Target, BarChart3, Calculator, Receipt, 
-  ArrowUpRight, ArrowDownRight, Briefcase, Plus, Pencil, Trash2, Link2
+  Link2, Pencil, Trash2
 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import TransacaoModal from './TransacaoModal';
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+const CATEGORIAS = {
+  receita: ['Vendas', 'Serviços', 'Rendimento', 'Outros'],
+  despesa: ['Fornecedores', 'Marketing', 'Impostos', 'Folha', 'Outros']
+};
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const CompanyDashboard = ({ oculto = false }) => {
-  const { transacoes, ecommerceStats, deleteTransacao } = useApp();
+  const { transacoes, ecommerceStats, deleteTransacao, addTransacao, updateTransacao } = useApp();
   const now = new Date();
   const [mesSelecionado, setMesSelecionado] = useState(now.getMonth());
   const [anoSelecionado, setAnoSelecionado] = useState(now.getFullYear());
+  const [filtroTempo, setFiltroTempo] = useState('Hoje');
+
+  // Modals
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('receita');
+  const [editItem, setEditItem] = useState(null);
+
+  const handleOpenModal = (tipo) => {
+    setModalType(tipo);
+    setEditItem(null);
+    setModalOpen(true);
+  };
 
   const mudarMes = (delta) => {
     let novoMes = mesSelecionado + delta;
@@ -58,7 +76,8 @@ const CompanyDashboard = ({ oculto = false }) => {
           {['Hoje', 'Ontem', '7 dias', 'Mês', 'Máximo'].map(f => (
             <button 
               key={f} 
-              className={`filter-pill ${f === 'Hoje' ? 'active' : ''}`} 
+              className={`filter-pill ${f === filtroTempo ? 'active' : ''}`} 
+              onClick={() => setFiltroTempo(f)}
             >
               {f}
             </button>
@@ -77,10 +96,10 @@ const CompanyDashboard = ({ oculto = false }) => {
           <button className="btn-premium btn-outline">
             <Link2 size={22} /> <span>Conectar Nuvemshop</span>
           </button>
-          <button className="btn-premium btn-danger">
+          <button className="btn-premium btn-danger" onClick={() => handleOpenModal('despesa')}>
             <TrendingDown size={22} /> <span>Nova Despesa</span>
           </button>
-          <button className="btn-premium btn-primary">
+          <button className="btn-premium btn-primary" onClick={() => handleOpenModal('receita')}>
             <TrendingUp size={22} /> <span>Nova Receita</span>
           </button>
         </div>
@@ -298,6 +317,20 @@ const CompanyDashboard = ({ oculto = false }) => {
         </div>
       </div>
 
+      <TransacaoModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={(data) => {
+          if (editItem) {
+            updateTransacao(editItem.id, { ...data, tipo: modalType });
+          } else {
+            addTransacao({ ...data, tipo: modalType, data: new Date().toISOString() });
+          }
+        }}
+        editData={editItem}
+        categorias={CATEGORIAS[modalType]}
+        escopo="empresa"
+      />
     </div>
   );
 };

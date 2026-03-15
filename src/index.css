@@ -31,15 +31,15 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
 
-  /* Glassmorphism Defaults */
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --glass-blur: blur(24px);
+  /* Glassmorphism Defaults (More Transparent) */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-blur: blur(20px);
   --glass-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    0 8px 32px 0 rgba(31, 38, 135, 0.07),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 
+  --color-primary-rgb: 30, 41, 59;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -47,16 +47,17 @@
 }
 
 [data-theme="company"] {
-  --color-bg: var(--brand-navy);
+  --color-bg: #0d1b3e;
   --color-text: #ffffff;
   --color-text-muted: #94a3b8;
   --color-primary: var(--brand-gold);
-  --color-accent: var(--brand-navy-depth);
-  --color-border: rgba(226, 176, 83, 0.15);
+  --color-accent: #162447;
+  --color-border: rgba(226, 176, 83, 0.1);
   
-  --glass-bg: rgba(22, 36, 71, 0.85);
-  --glass-border: rgba(226, 176, 83, 0.1);
-  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(22, 36, 71, 0.4);
+  --glass-border: rgba(226, 176, 83, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --color-primary-rgb: 226, 176, 83;
 }
 
 
@@ -474,7 +475,7 @@ h3 { font-size: 1.25rem; }
 }
 
 [data-theme="company"] .mode-icon-box {
-  background: #fff;
+  background: var(--brand-gold);
   color: var(--brand-navy);
 }
 
@@ -595,7 +596,13 @@ h3 { font-size: 1.25rem; }
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+[data-theme="company"] .wintrack-card {
+  background: rgba(22, 36, 71, 0.5);
+  border: 1px solid rgba(226, 176, 83, 0.1);
 }
 
 .wintrack-card.gold-border {
@@ -603,8 +610,9 @@ h3 { font-size: 1.25rem; }
 }
 
 .wintrack-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(226, 176, 83, 0.2);
+  transform: translateY(-4px);
+  border-color: var(--brand-gold);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* ======== BUTTONS ======== */
@@ -780,6 +788,148 @@ button {
   color: var(--color-danger) !important;
 }
 
+/* ======== LEGACY APP.CSS LAYOUTS (RESTORED) ======== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.overview-card {
+  padding: var(--space-lg);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon.success { background: var(--color-success-bg); color: var(--color-success); }
+.card-icon.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+.card-icon.primary { background: rgba(0,0,0,0.05); color: var(--color-primary); }
+
+.card-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.data-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.data-grid-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.item-info-flex {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 600;
+}
+
+.icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-badge.success { background: var(--color-success-bg); color: var(--color-success); }
+.icon-badge.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+
+.item-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.main-value {
+  font-weight: 700;
+}
+
+.category-manager {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.manager-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.category-tag-premium {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.4rem 0.8rem;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.tag-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.tag-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 2px;
+  border-radius: 4px;
+}
+.tag-btn:hover { background: rgba(0,0,0,0.1); color: var(--color-text); }
+.tag-btn.danger:hover { background: var(--color-danger-bg); color: var(--color-danger); }
+
+
 /* ======== RESPONSIVE ======== */
 @media (max-width: 1024px) {
   .sidebar {
@@ -907,63 +1057,49 @@ button {
 /* ======== WINTRACK UI COMPONENTS ======== */
 .wintrack-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.wintrack-card {
-  background: #162447; /* Official Card Depth */
-  border: 1px solid rgba(226, 176, 83, 0.05);
-  border-radius: 16px;
-  padding: 1.5rem;
-  position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
-}
-
-.wintrack-card.gold-border {
-  border-left: 4px solid #e2b053;
-}
-
-.wintrack-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(226, 176, 83, 0.2);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .wintrack-card .label {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 1rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.75rem;
 }
 
 .wintrack-card .value {
-  font-size: 2.25rem; /* Larger values */
-  font-weight: 900; /* Black weight */
-  color: #ffffff;
-  margin-bottom: 0.5rem;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.1;
+  word-break: break-all;
+  padding-right: 2.5rem; /* Ensure space for icon */
 }
 
 .wintrack-card .sub-value {
-  font-size: 0.85rem;
-  color: #94a3b8;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-top: 0.5rem;
 }
 
 .wintrack-card .icon-box {
   position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(226, 176, 83, 0.1);
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(226, 176, 83, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e2b053;
+  color: var(--brand-gold);
+  opacity: 0.8;
 }
 
 .wintrack-table-container {
