@@ -8,6 +8,7 @@ import TransacoesPage from './TransacoesPage';
 import InvestimentosPage from './InvestimentosPage';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
+import ErrorBoundary from './ErrorBoundary';
 
 // Novos módulos enterprise
 import SalesPage from './enterprise/SalesPage';
@@ -142,7 +143,10 @@ const DashboardContainer = () => {
           </div>
         </header>
 
-        {renderPage()}
+        <ErrorBoundary key={`${isCompanyMode}-${activePage}`}>
+          {renderPage()}
+        </ErrorBoundary>
+
       </main>
 
 
