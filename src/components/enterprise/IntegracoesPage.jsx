@@ -25,8 +25,8 @@ const IntegracoesPage = ({ oculto }) => {
 
   const integrations = [
     { name: 'Nuvemshop', status: nuvemshopStatus, icon: ShoppingCart, desc: 'Sincronize vendas, produtos e estoque automaticamente.' },
-    { name: 'Meta Ads Manager', status: 'conectado', icon: Facebook, desc: 'Acompanhe ROAS, CPC e performance das campanhas em tempo real.' },
-    { name: 'Google Analytics 4', status: 'conectado', icon: Globe, desc: 'Análise completa de tráfego, UTMs e comportamento do usuário.' },
+    { name: 'Meta Ads Manager', status: 'desconectado', icon: Facebook, desc: 'Acompanhe ROAS, CPC e performance das campanhas em tempo real.' },
+    { name: 'Google Analytics 4', status: 'desconectado', icon: Globe, desc: 'Análise completa de tráfego, UTMs e comportamento do usuário.' },
     { name: 'RD Station CRM', status: 'desconectado', icon: Link2, desc: 'Envie seus leads e vendas diretamente para o funil do CRM.' },
   ];
 
